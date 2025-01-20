@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Book } = require("../models");
 
 const addBook = async (req, res) => {
@@ -25,6 +26,32 @@ const addBook = async (req, res) => {
     }
 };
 
+const updateBook = async (req, res) => {
+    const { bookId } = req.params;
+    try {
+        const book = await Book.findByPk(+bookId);
+
+        console.log(book);
+
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
+        //update book
+
+        book.title = req.body.title;
+        book.genre = req.body.genre;
+
+        await book.save();
+
+        return res
+            .status(200)
+            .json({ message: "Book updated successfully", book });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 const searchBooks = async (req, res) => {
     const { title, author } = req.query;
 
@@ -45,4 +72,4 @@ const searchBooks = async (req, res) => {
     }
 };
 
-module.exports = { addBook, searchBooks };
+module.exports = { addBook, searchBooks, updateBook };
